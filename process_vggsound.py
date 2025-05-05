@@ -115,6 +115,9 @@ def process_video(
     video_path = os.path.join(dataset_path, "video", video_id)
     audio_path = os.path.join(dataset_path, "audio", video_id.replace(".mp4", ".wav"))
 
+    print(video_path)
+    print(audio_path)
+    
     detected = []
     response = ""
 

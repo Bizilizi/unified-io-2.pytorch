@@ -1,9 +1,6 @@
-mkdir -p $(pwd)/vggsound
-/usr/bin/squashfuse /dss/dssmcmlfs01/pn67gu/pn67gu-dss-0000/zverev/datasets/vggsound.squashfs $(pwd)/vggsound
-
 python process_vggsound.py \
     --tokenizer_path config/tokenizer.model \
-    --dataset_path $(pwd)/vggsound \
+    --dataset_path ~/vggsound \
     --video_csv ../../data/train.csv \
     --output_csv csv/av/predictions.csv \
     --page 1 \
