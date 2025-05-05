@@ -1,4 +1,4 @@
-mkdir -p /tmp/zverev/vggsound
+mkdir -p /tmp/vggsound
 /usr/bin/squashfuse /dss/dssmcmlfs01/pn67gu/pn67gu-dss-0000/zverev/datasets/vggsound.squashfs /tmp/vggsound
 
 python process_vggsound.py \
