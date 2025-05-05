@@ -10,9 +10,10 @@ range of tasks.
 Install [pytorch](https://pytorch.org/) following the recommendation for your system. Then install with
 
 ```
-git clone unified-io-2.pytorch
-cd unified-io-2.pytorch
+conda create -n uio2 python=3.10
+conda activate uio2
 pip install -r requirements.txt
+conda install conda-forge::ffmpeg
 ```
 
 ## Loading the model

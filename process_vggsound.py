@@ -114,9 +114,6 @@ def process_video(
     # Set up paths based on modality
     video_path = os.path.join(dataset_path, "video", video_id)
     audio_path = os.path.join(dataset_path, "audio", video_id.replace(".mp4", ".wav"))
-
-    print(video_path)
-    print(audio_path)
     
     detected = []
     response = ""
@@ -188,7 +185,6 @@ def process_video(
                     preprocessed = preprocessor(
                         text_inputs=prompt_text,
                         video_inputs=video_path,
-                        audio_inputs=audio_path,
                         target_modality="text",
                     )
                 elif modality == "a":
