@@ -1,6 +1,7 @@
 #!/usr/bin/env python
 import os
 import sys
+import traceback
 import torch
 import pandas as pd
 import numpy as np
@@ -236,7 +237,7 @@ def process_video(
             )
 
     except Exception as e:
-        print(f"Error processing video {video_id}: {e}")
+        print(f"Error processing video {video_id}: {traceback.format_exc()}")
         return [], f"Error: {str(e)}"
 
     # Return the unique set of detected classes and response
@@ -363,6 +364,11 @@ def main():
         ".csv", f"_{args.prompt_mode}_page_{args.page}.csv"
     )
 
+    if os.path.exists(args.output_csv):
+        already_processed = pd.read_csv(args.output_csv)
+        already_processed = set(already_processed["video_id"].tolist())
+        page_videos = [vid for vid in page_videos if vid not in already_processed]
+        
     predictions = {}
     responses = {}
 
