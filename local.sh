@@ -6,5 +6,7 @@ python process_vggsound.py \
     --page 1 \
     --per_page 10 \
     --modality av \
-    --prompt_mode multi \
-    --prompt "Do you see {cl} class in this video? Answer only with yes or no."
+    --prompt_mode single \
+    --prompt "Classes: {cl}. From the given list of classes, which ones do you see or hear in this video? Answer using the exact names of the classes, separated by commas."
+#    --prompt_mode multi \
+#    --prompt "Do you see {cl} class in this video? Answer only with yes or no."

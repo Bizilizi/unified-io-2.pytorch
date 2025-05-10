@@ -1,6 +1,6 @@
 #!/bin/sh
 #SBATCH --job-name="unifiedio2"
-#SBATCH --array=1-16
+#SBATCH --array=0-16
 #SBATCH --nodes=1
 #SBATCH --ntasks=1
 #SBATCH --cpus-per-task=8

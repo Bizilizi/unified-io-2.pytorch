@@ -303,7 +303,7 @@ def main():
     )
 
     # Processing configuration
-    parser.add_argument("--page", type=int, default=1, help="Page number to process")
+    parser.add_argument("--page", type=int, default=0, help="Page number to process")
     parser.add_argument(
         "--per_page",
         type=int,
