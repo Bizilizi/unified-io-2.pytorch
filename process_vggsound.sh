@@ -1,6 +1,6 @@
 #!/bin/sh
 #SBATCH --job-name="unified-io-2"
-#SBATCH --array=0-16
+#SBATCH --array=0-15
 #SBATCH --nodes=1
 #SBATCH --ntasks=1
 #SBATCH --cpus-per-task=8
@@ -15,18 +15,6 @@
 #SBATCH --error=./logs/slurm-%A_%a.out
  
 nvidia-smi
-
-# Mount squashfs files
-cleanup () {
-    fusermount -u /tmp/zverev/$SLURM_JOB_ID/vggsound
-    rmdir /tmp/zverev/$SLURM_JOB_ID/vggsound
-}
-
-trap cleanup EXIT
-
-echo "Mounting VGGsound"
-mkdir -p /tmp/zverev/$SLURM_JOB_ID/vggsound
-/usr/bin/squashfuse /dss/dssmcmlfs01/pn67gu/pn67gu-dss-0000/zverev/datasets/vggsound.squashfs /tmp/zverev/$SLURM_JOB_ID/vggsound
 
 # Activate your conda environment (adjust if needed)
 set -x
@@ -46,7 +34,7 @@ fi
 # Run the script on each node, assigning each task to a different GPU
 srun --exclusive --ntasks=1 python process_vggsound.py \
     --tokenizer_path config/tokenizer.model \
-    --dataset_path /tmp/zverev/$SLURM_JOB_ID/vggsound \
+    --dataset_path $MCMLSCRATCH/datasets/vggsound_test \
     --video_csv ../../data/train.csv \
     --output_csv csv/$modality/predictions.csv \
     --page $SLURM_ARRAY_TASK_ID \
