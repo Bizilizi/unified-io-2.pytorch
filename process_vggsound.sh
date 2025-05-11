@@ -35,7 +35,7 @@ fi
 srun --exclusive --ntasks=1 python process_vggsound.py \
     --tokenizer_path config/tokenizer.model \
     --dataset_path $MCMLSCRATCH/datasets/vggsound_test \
-    --video_csv ../../data/train.csv \
+    --video_csv ../../data/test.csv \
     --output_csv csv/$modality/predictions.csv \
     --page $SLURM_ARRAY_TASK_ID \
     --per_page 1000 \
