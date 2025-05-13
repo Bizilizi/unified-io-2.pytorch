@@ -7,7 +7,7 @@
 #SBATCH --gres=gpu:1
 #SBATCH --partition=mcml-hgx-a100-80x4,mcml-hgx-h100-94x4,mcml-dgx-a100-40x8
 #SBATCH --qos=mcml
-#SBATCH --mem=48G
+#SBATCH --mem=96GB
 #SBATCH --time=48:00:00
 #SBATCH --mail-type=ALL
 #SBATCH --mail-user=zverev@in.tum.de
