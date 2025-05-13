@@ -1,4 +1,5 @@
 #!/usr/bin/env python
+import ast
 import os
 import sys
 import traceback
@@ -389,11 +390,19 @@ def main():
 
     if os.path.exists(args.output_csv):
         already_processed = pd.read_csv(args.output_csv)
-        already_processed = set(already_processed["video_id"].tolist())
-        page_videos = [vid for vid in page_videos if vid not in already_processed]
-
-    predictions = {}
-    responses = {}
+        already_processed_ids = set(already_processed["video_id"].tolist())
+        page_videos = [vid for vid in page_videos if vid not in already_processed_ids]
+        print(f"Skipping {len(already_processed)} videos that were already processed.")
+        
+        predictions = {}
+        responses = {}
+        
+        for _, row in already_processed.iterrows():
+            predictions[row["video_id"]] = ast.literal_eval(row["suggestions"])
+            responses[row["video_id"]] = row["response"]
+    else:
+        predictions = {}
+        responses = {}
     # set model modalities
     if args.modality == "av":
         model.set_modalities(input_modalities=["text", "image_history", "audio"], target_modalities=["text"])
