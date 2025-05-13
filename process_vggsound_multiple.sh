@@ -40,5 +40,5 @@ srun --exclusive --ntasks=1 python process_vggsound.py \
     --page $SLURM_ARRAY_TASK_ID \
     --per_page 100 \
     --modality $modality \
-    --prompt_mode single \
+    --prompt_mode multi \
     --prompt "$PROMPT"
