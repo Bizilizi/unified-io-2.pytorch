@@ -6,7 +6,7 @@ import torch
 import pandas as pd
 import numpy as np
 import argparse
-from tqdm.auto import tqdm
+from tqdm.auto import tqdm, trange
 from PIL import Image
 import librosa
 from pathlib import Path
@@ -36,7 +36,9 @@ def load_model(args):
     else:
         # Try to load from HuggingFace Hub
         os.makedirs(args.cache_dir, exist_ok=True)
-        model = UnifiedIOModel.from_pretrained(args.model_path, cache_dir=args.cache_dir)
+        model = UnifiedIOModel.from_pretrained(
+            args.model_path, cache_dir=args.cache_dir
+        )
 
     # Load preprocessor from local path or HuggingFace Hub
     if os.path.exists(args.preprocessor_path):
@@ -47,7 +49,9 @@ def load_model(args):
         # Try to load from HuggingFace Hub
         os.makedirs(args.cache_dir, exist_ok=True)
         preprocessor = UnifiedIOPreprocessor.from_pretrained(
-            args.preprocessor_path, tokenizer=args.tokenizer_path, cache_dir=args.cache_dir
+            args.preprocessor_path,
+            tokenizer=args.tokenizer_path,
+            cache_dir=args.cache_dir,
         )
 
     # Convert to specified dtype for efficiency
@@ -107,6 +111,7 @@ def process_video(
     modality="av",
     prompt="Do you hear or see '{cl}' class in this video? Answer only with yes or no.",
     prompt_mode="single",
+    batch_size=4,
 ):
     """
     Process a single video file and detect classes using Unified-IO 2 model.
@@ -115,7 +120,7 @@ def process_video(
     # Set up paths based on modality
     video_path = os.path.join(dataset_path, "video", video_id)
     audio_path = os.path.join(dataset_path, "audio", video_id.replace(".mp4", ".wav"))
-    
+
     detected = []
     response = ""
 
@@ -163,7 +168,9 @@ def process_video(
 
             # Generate response
             tokens = model.generate(
-                batch=batch, generation_config=generation_config, modality="text"
+                batch=batch,
+                generation_config=generation_config,
+                modality="text",
             )
 
             # Decode response
@@ -177,33 +184,40 @@ def process_video(
         elif prompt_mode == "multi":
             all_responses = []
 
-            for cl in tqdm(CLASSES, desc="Processing classes", leave=False):
-                # Format prompt for this specific class
-                prompt_text = prompt.format(cl=cl)
+            for i in trange(
+                0, len(CLASSES), batch_size, desc="Processing classes", leave=False
+            ):
+                batch_classes = CLASSES[i : i + batch_size]
+                batch_tokens = []
 
-                # Create preprocessed inputs based on modality
-                if modality == "av":
-                    preprocessed = preprocessor(
-                        text_inputs=prompt_text,
-                        video_inputs=video_path,
-                        target_modality="text",
-                    )
-                elif modality == "a":
-                    preprocessed = preprocessor(
-                        text_inputs=prompt_text,
-                        audio_inputs=audio_path,
-                        target_modality="text",
-                    )
-                elif modality == "v":
-                    preprocessed = preprocessor(
-                        text_inputs=prompt_text,
-                        video_inputs=video_path,
-                        use_video_audio=False,
-                        target_modality="text",
-                    )
+                for cl in batch_classes:
+                    # Format prompt for this specific class
+                    prompt_text = prompt.format(cl=cl)
+
+                    # Create preprocessed inputs based on modality
+                    if modality == "av":
+                        preprocessed = preprocessor(
+                            text_inputs=prompt_text,
+                            video_inputs=video_path,
+                            target_modality="text",
+                        )
+                    elif modality == "a":
+                        preprocessed = preprocessor(
+                            text_inputs=prompt_text,
+                            audio_inputs=audio_path,
+                            target_modality="text",
+                        )
+                    elif modality == "v":
+                        preprocessed = preprocessor(
+                            text_inputs=prompt_text,
+                            video_inputs=video_path,
+                            use_video_audio=False,
+                            target_modality="text",
+                        )
+                    batch_tokens.append(preprocessed)
 
                 # Create batch and generate response
-                batch = build_batch([preprocessed], device=model.device)
+                batch = build_batch(batch_tokens, device=model.device)
 
                 # Configure generation parameters
                 generation_config = GenerationConfig(
@@ -218,14 +232,17 @@ def process_video(
 
                 # Generate response
                 tokens = model.generate(
-                    batch=batch, generation_config=generation_config, modality="text"
+                    batch=batch,
+                    generation_config=generation_config,
+                    modality="text",
                 )
 
                 # Decode response
-                class_response = preprocessor.tokenizer.decode(tokens[0])
+                for cl, class_response in zip(batch_classes, tokens):
+                    class_response = preprocessor.tokenizer.decode(class_response)
 
-                if "yes" in class_response.lower():
-                    detected.append(cl)
+                    if "yes" in class_response.lower():
+                        detected.append(cl)
 
                 all_responses.append(f"{cl}: {class_response}")
 
@@ -253,7 +270,7 @@ def main():
     parser.add_argument(
         "--model_path",
         type=str,
-        default="allenai/uio2-large",
+        default="allenai/uio2-xxl",
         help="Path to model or HuggingFace model name",
     )
     parser.add_argument(
@@ -342,6 +359,12 @@ def main():
         default="./config/tokenizer.model",
         help="Path to tokenizer file (required for the UIO2 preprocessor)",
     )
+    parser.add_argument(
+        "--batch_size",
+        type=int,
+        default=4,
+        help="Batch size for processing videos",
+    )
 
     args = parser.parse_args()
 
@@ -368,10 +391,17 @@ def main():
         already_processed = pd.read_csv(args.output_csv)
         already_processed = set(already_processed["video_id"].tolist())
         page_videos = [vid for vid in page_videos if vid not in already_processed]
-        
+
     predictions = {}
     responses = {}
-
+    # set model modalities
+    if args.modality == "av":
+        model.set_modalities(input_modalities=["text", "image_history", "audio"], target_modalities=["text"])
+    elif args.modality == "a":
+        model.set_modalities(input_modalities=["text", "audio"], target_modalities=["text"])
+    elif args.modality == "v":
+        model.set_modalities(input_modalities=["text", "image_history"], target_modalities=["text"])
+        
     # Process each video
     for video_id in tqdm(page_videos, desc="Processing Videos"):
         detected_classes, response = process_video(
@@ -385,6 +415,7 @@ def main():
             modality=args.modality,
             prompt=args.prompt,
             prompt_mode=args.prompt_mode,
+            batch_size=args.batch_size,
         )
 
         predictions[video_id] = detected_classes
