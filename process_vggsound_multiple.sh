@@ -42,6 +42,6 @@ srun --exclusive --ntasks=1 python process_vggsound.py \
     --modality $modality \
     --prompt_mode multi \
     --prompt "$PROMPT" \
-    --batch_size 309 \
+    --batch_size 256 \
     --temperature 0.9 \
     --top_p 0.9
