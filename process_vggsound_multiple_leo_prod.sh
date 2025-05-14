@@ -1,13 +1,13 @@
 #!/bin/bash
-#SBATCH --job-name="jid:vla-fn48"
-#SBATCH --nodes=65
-#SBATCH --ntasks=260
+#SBATCH --job-name="jobid_1882js8"
+#SBATCH --nodes=80
+#SBATCH --ntasks=320
 #SBATCH --cpus-per-task=8
 #SBATCH --gres=gpu:4
 #SBATCH --partition=boost_usr_prod
 #SBATCH --qos=boost_qos_bprod
-#SBATCH --mem=256G
-#SBATCH --time=00:20:00
+#SBATCH --mem=450G
+#SBATCH --time=07:00:00
 #SBATCH --mail-type=ALL
 #SBATCH --mail-user=a-sophia.koepke@uni-tuebingen.de
 #SBATCH --output=./logs/slurm-%j.out
@@ -39,7 +39,7 @@ srun $SRUN_ARGS bash -c " python process_vggsound.py \
     --video_csv ../../data/test.csv \
     --output_csv csv/$modality/predictions.csv \
     --page \$SLURM_PROCID \
-    --per_page 60 \
+    --per_page 49 \
     --modality $modality \
     --prompt_mode multi \
     --prompt \"$PROMPT\" \
