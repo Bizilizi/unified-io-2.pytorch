@@ -1,8 +1,8 @@
 #!/bin/bash
 #SBATCH --job-name="jid:vla-fn48"
 #SBATCH --nodes=65
-#SBATCH --ntasks-per-node=4 
-#SBATCH --cpus-per-task=24
+#SBATCH --ntasks=260
+#SBATCH --cpus-per-task=8
 #SBATCH --gres=gpu:4
 #SBATCH --partition=boost_usr_prod
 #SBATCH --qos=boost_qos_bprod
