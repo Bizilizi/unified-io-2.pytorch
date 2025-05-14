@@ -369,7 +369,8 @@ def main():
     )
 
     args = parser.parse_args()
-
+    print(f"Processing page {args.page} of {len(video_list) // args.per_page}")
+    
     # Initialize model and preprocessor
     model, preprocessor = load_model(args)
 
@@ -388,7 +389,7 @@ def main():
     args.output_csv = args.output_csv.replace(
         ".csv", f"_{args.prompt_mode}_page_{args.page}.csv"
     )
-
+    
     if os.path.exists(args.output_csv):
         already_processed = pd.read_csv(args.output_csv)
         already_processed_ids = set(already_processed["video_id"].tolist())
