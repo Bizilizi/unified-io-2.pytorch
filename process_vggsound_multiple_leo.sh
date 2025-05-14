@@ -21,7 +21,7 @@ set -x
 export SRUN_CPUS_PER_TASK=$SLURM_CPUS_PER_TASK
 
 modality=$1
-echo "This is $modality, page $SLURM_ARRAY_TASK_ID"
+echo "This is $modality, page 1"
 
 # Set the appropriate prompt based on the modality
 if [ "$modality" = "a" ]; then
@@ -33,10 +33,10 @@ fi
 # Run the script on each node, assigning each task to a different GPU
 srun --exclusive --ntasks=1 python process_vggsound.py \
     --tokenizer_path config/tokenizer.model \
-    --dataset_path $MCMLSCRATCH/datasets/vggsound_test \
+    --dataset_path /leonardo_work/EUHPC_E03_068/akoepke/vs \
     --video_csv ../../data/test.csv \
     --output_csv csv/$modality/predictions.csv \
-    --page $SLURM_ARRAY_TASK_ID \
+    --page 1 \
     --per_page 100 \
     --modality $modality \
     --prompt_mode multi \
