@@ -22,7 +22,7 @@ set -x
 export SRUN_CPUS_PER_TASK=$SLURM_CPUS_PER_TASK
 
 modality=$1
-echo "This is $modality, page 1"
+echo "This is $modality"
 
 # Set the appropriate prompt based on the modality
 if [ "$modality" = "a" ]; then
