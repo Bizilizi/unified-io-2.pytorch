@@ -369,7 +369,7 @@ def main():
     )
 
     args = parser.parse_args()
-    print(f"Processing page {args.page} of {len(video_list) // args.per_page}")
+    print(f"Processing page {args.page}")
     
     # Initialize model and preprocessor
     model, preprocessor = load_model(args)
