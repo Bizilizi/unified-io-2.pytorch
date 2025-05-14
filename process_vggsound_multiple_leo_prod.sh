@@ -43,7 +43,7 @@ srun $SRUN_ARGS bash -c " python process_vggsound.py \
     --video_csv ../../data/test.csv \
     --output_csv csv/$modality/predictions.csv \
     --page \$SLURM_PROCID \
-    --per_page 1000 \
+    --per_page 60 \
     --modality $modality \
     --prompt_mode multi \
     --prompt \"$PROMPT\" \
