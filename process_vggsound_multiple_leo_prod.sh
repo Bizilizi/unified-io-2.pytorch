@@ -5,7 +5,7 @@
 #SBATCH --cpus-per-task=24
 #SBATCH --gres=gpu:4
 #SBATCH --partition=boost_usr_prod
-#SBATCH --qos=NORMAL
+#SBATCH --qos=normal
 #SBATCH --mem=250G
 #SBATCH --time=8:00:00
 #SBATCH --mail-type=ALL
