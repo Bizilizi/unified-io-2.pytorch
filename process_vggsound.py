@@ -245,7 +245,7 @@ def process_video(
                     if "yes" in class_response.lower():
                         detected.append(cl)
 
-                all_responses.append(f"{cl}: {class_response}")
+                    all_responses.append(f"{cl}: {class_response}")
 
             response = ",".join(all_responses)
 
@@ -259,6 +259,7 @@ def process_video(
         return [], f"Error: {str(e)}"
 
     # Return the unique set of detected classes and response
+    response = response.replace("\n", "\\n")
     return list(set(detected)), response
 
 
