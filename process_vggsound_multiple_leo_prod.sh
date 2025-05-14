@@ -25,11 +25,7 @@ modality=$1
 echo "This is $modality"
 
 # Set the appropriate prompt based on the modality
-if [ "$modality" = "a" ]; then
-    PROMPT="Do you hear \"{cl}\" class in this audio? Answer only with yes or no."
-else
-    PROMPT="Do you see or hear \"{cl}\" class in this video? Answer only with yes or no."
-fi
+PROMPT="Do you see or hear \"{cl}\" class in this video? Answer only with yes or no."
 
 SRUN_ARGS=" \
     --wait=60 \
