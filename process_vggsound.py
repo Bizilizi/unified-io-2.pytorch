@@ -369,7 +369,6 @@ def main():
     )
 
     args = parser.parse_args()
-    print(f"Processing page {args.page}")
     
     # Initialize model and preprocessor
     model, preprocessor = load_model(args)
@@ -405,6 +404,8 @@ def main():
     else:
         predictions = {}
         responses = {}
+    
+    print(f"Processing page {args.page} of {len(page_videos)} videos")
     # set model modalities
     if args.modality == "av":
         model.set_modalities(input_modalities=["text", "image_history", "audio"], target_modalities=["text"])
