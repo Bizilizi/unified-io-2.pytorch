@@ -27,13 +27,8 @@ echo "This is $modality"
 # Set the appropriate prompt based on the modality
 PROMPT="Do you see or hear \"{cl}\" class in this video? Answer only with yes or no."
 
-SRUN_ARGS=" \
-    --wait=60 \
-    --kill-on-bad-exit=1 \
-    --jobid $SLURM_JOB_ID \
-    "
 
-srun $SRUN_ARGS bash -c " python process_vggsound.py \
+srun bash -c " python process_vggsound.py \
     --tokenizer_path config/tokenizer.model \
     --dataset_path /leonardo_work/EUHPC_E03_068/akoepke/vs \
     --video_csv ../../data/test.csv \
@@ -43,7 +38,7 @@ srun $SRUN_ARGS bash -c " python process_vggsound.py \
     --modality $modality \
     --prompt_mode multi \
     --prompt \"$PROMPT\" \
-    --batch_size 256 \
+    --batch_size 128 \
     --temperature 0.9 \
     --top_p 0.9
     "
