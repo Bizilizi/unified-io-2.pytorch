@@ -26,19 +26,19 @@ echo "This is $modality, page $SLURM_ARRAY_TASK_ID"
 
 # Set the appropriate prompt based on the modality
 if [ "$modality" = "a" ]; then
-    PROMPT="Classes: {cl}. From the given list of classes, which ones do you hear in this audio? Answer using the exact names of the classes, separated by commas."
+    PROMPT="What actions are being performed in this audio, explain all sounds and actions in the audio? Please provide a short answer."
 else
-    PROMPT="Classes: {cl}. From the given list of classes, which ones do you see or hear in this video? Answer using the exact names of the classes, separated by commas."
+    PROMPT="What actions are being performed in this video, explain all sounds and actions in the video? Please provide a short answer."
 fi
 
 # Run the script on each node, assigning each task to a different GPU
 srun --exclusive --ntasks=1 python process_vggsound.py \
     --tokenizer_path config/tokenizer.model \
     --dataset_path $MCMLSCRATCH/datasets/vggsound_test \
-    --video_csv ../../data/test.csv \
+    --video_csv ../../data/test_sample.csv \
     --output_csv csv/$modality/predictions.csv \
     --page $SLURM_ARRAY_TASK_ID \
-    --per_page 1000 \
+    --per_page 100 \
     --modality $modality \
     --prompt_mode single \
     --prompt "$PROMPT"
