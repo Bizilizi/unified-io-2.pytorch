@@ -6,5 +6,5 @@ python process_vggsound.py \
     --page 1 \
     --per_page 100 \
     --modality av \
-    --prompt_mode single \
+    --prompt_mode gpt \
     --prompt "What actions are being performed in this video, explain all sounds and actions in the video? Please provide a short answer."

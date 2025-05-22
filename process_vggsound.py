@@ -127,7 +127,7 @@ def process_video(
 
     try:
         # Process with either single prompt for all classes or individual prompts per class
-        if prompt_mode == "single":
+        if prompt_mode in ["single", "gpt"]:
             # Format prompt with all classes
             prompt_text = prompt.format(cl=", ".join(CLASSES))
 
@@ -346,8 +346,8 @@ def main():
         "--prompt_mode",
         type=str,
         default="single",
-        choices=["single", "multi"],
-        help="Prompt mode: 'single' for one prompt with all classes, 'multi' for individual prompts per class",
+        choices=["single", "multi", "gpt"],
+        help="Prompt mode: 'single' for one prompt with all classes, 'multi' for individual prompts per class, 'gpt' for GPT assisted`",
     )
     parser.add_argument(
         "--cache_dir",
