@@ -1,7 +1,7 @@
 python process_vggsound.py \
     --tokenizer_path config/tokenizer.model \
-    --dataset_path ~/vggsound \
-    --video_csv ../../data/train_sample.csv \
+    --dataset_path $MCMLSCRATCH/datasets/vggsound_test \
+    --video_csv ../../data/test_sample.csv \
     --output_csv csv/av/predictions.csv \
     --page 1 \
     --per_page 100 \
