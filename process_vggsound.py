@@ -364,7 +364,7 @@ def main():
     parser.add_argument(
         "--batch_size",
         type=int,
-        default=4,
+        default=1,
         help="Batch size for processing videos",
     )
 
