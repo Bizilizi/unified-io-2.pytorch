@@ -128,8 +128,10 @@ def process_video(
     try:
         # Process with either single prompt for all classes or individual prompts per class
         if prompt_mode in ["single", "gpt"]:
-            # Format prompt with all classes
-            prompt_text = prompt.format(cl=", ".join(CLASSES))
+            if prompt_mode == "single":
+                prompt_text = prompt.format(cl=", ".join(CLASSES))
+            elif prompt_mode == "gpt":
+                prompt_text = prompt
 
             # Create preprocessed inputs based on modality
             if modality == "av":
