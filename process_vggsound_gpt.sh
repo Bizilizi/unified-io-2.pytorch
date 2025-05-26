@@ -1,6 +1,5 @@
 #!/bin/sh
 #SBATCH --job-name="unified-io-2"
-#SBATCH --array=0-0
 #SBATCH --nodes=1
 #SBATCH --ntasks=2
 #SBATCH --cpus-per-task=8
@@ -8,7 +7,7 @@
 #SBATCH --partition=mcml-hgx-a100-80x4,mcml-hgx-h100-94x4,mcml-dgx-a100-40x8
 #SBATCH --qos=mcml
 #SBATCH --mem=96G
-#SBATCH --time=48:00:00
+#SBATCH --time=24:00:00
 #SBATCH --mail-type=ALL
 #SBATCH --mail-user=zverev@in.tum.de
 #SBATCH --output=./logs/slurm-%A_%a.out
@@ -32,14 +31,21 @@ else
 fi
 
 # Run the script on each node, assigning each task to a different GPU
-srun --exclusive --ntasks=1 python process_vggsound.py \
+SRUN_ARGS=" \
+    --wait=60 \
+    --kill-on-bad-exit=0 \
+    --jobid $SLURM_JOB_ID \
+    "
+
+srun $SRUN_ARGS bash -c " python process_vggsound.py \
     --tokenizer_path config/tokenizer.model \
     --dataset_path $MCMLSCRATCH/datasets/vggsound_test \
     --video_csv ../../data/test.csv \
     --output_csv csv/$modality/predictions.csv \
-    --page \$((\$SLURM_ARRAY_TASK_ID * 2 + \$SLURM_LOCALID)) \
+    --page \$SLURM_LOCALID \
     --per_page 7750 \
     --modality $modality \
     --prompt_mode gpt \
-    --prompt "$PROMPT" \
+    --prompt \"$PROMPT\" \
     --device cuda:\$SLURM_LOCALID
+    "

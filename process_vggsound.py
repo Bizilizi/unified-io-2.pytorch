@@ -25,6 +25,10 @@ from transformers import GenerationConfig
 CLASSES = pd.read_csv("../../data/audio_classes.csv")["display_name"].tolist()
 
 
+def singleton_batch(batch, device):
+    return {k: torch.as_tensor(v, device=device)[None, ...] for k, v in batch.items()}
+
+
 def load_model(args):
     """
     Load the Unified-IO 2 model
@@ -156,7 +160,7 @@ def process_video(
                 )
 
             # Create batch and generate response
-            batch = build_batch([preprocessed], device=model.device)
+            batch = singleton_batch(preprocessed, device=model.device)
 
             # Configure generation parameters
             generation_config = GenerationConfig(
@@ -173,11 +177,12 @@ def process_video(
             tokens = model.generate(
                 batch=batch,
                 generation_config=generation_config,
+                use_cache=True,
                 modality="text",
             )
 
             # Decode response
-            response = preprocessor.tokenizer.decode(tokens[0])
+            response = preprocessor.tokenizer.decode(tokens[0].cpu())
 
             # Check for detected classes
             for cl in CLASSES:
@@ -371,7 +376,7 @@ def main():
     )
 
     args = parser.parse_args()
-    
+
     # Initialize model and preprocessor
     model, preprocessor = load_model(args)
 
@@ -390,32 +395,32 @@ def main():
     args.output_csv = args.output_csv.replace(
         ".csv", f"_{args.prompt_mode}_page_{args.page}.csv"
     )
-    
+
     if os.path.exists(args.output_csv):
         already_processed = pd.read_csv(args.output_csv)
         already_processed_ids = set(already_processed["video_id"].tolist())
         page_videos = [vid for vid in page_videos if vid not in already_processed_ids]
         print(f"Skipping {len(already_processed)} videos that were already processed.")
-        
+
         predictions = {}
         responses = {}
-        
+
         for _, row in already_processed.iterrows():
             predictions[row["video_id"]] = ast.literal_eval(row["suggestions"])
             responses[row["video_id"]] = row["response"]
     else:
         predictions = {}
         responses = {}
-    
+
     print(f"Processing page {args.page} of {len(page_videos)} videos")
     # set model modalities
-    if args.modality == "av":
-        model.set_modalities(input_modalities=["text", "image_history", "audio"], target_modalities=["text"])
-    elif args.modality == "a":
-        model.set_modalities(input_modalities=["text", "audio"], target_modalities=["text"])
-    elif args.modality == "v":
-        model.set_modalities(input_modalities=["text", "image_history"], target_modalities=["text"])
-        
+    # if args.modality == "av":
+    #     model.set_modalities(input_modalities=["text", "image_history", "audio"], target_modalities=["text"])
+    # elif args.modality == "a":
+    #     model.set_modalities(input_modalities=["text", "audio"], target_modalities=["text"])
+    # elif args.modality == "v":
+    #     model.set_modalities(input_modalities=["text", "image_history"], target_modalities=["text"])
+
     # Process each video
     for video_id in tqdm(page_videos, desc="Processing Videos"):
         detected_classes, response = process_video(
