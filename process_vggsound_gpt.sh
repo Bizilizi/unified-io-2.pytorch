@@ -2,9 +2,9 @@
 #SBATCH --job-name="unified-io-2"
 #SBATCH --array=0-0
 #SBATCH --nodes=1
-#SBATCH --ntasks=1
+#SBATCH --ntasks=2
 #SBATCH --cpus-per-task=8
-#SBATCH --gres=gpu:1
+#SBATCH --gres=gpu:2
 #SBATCH --partition=mcml-hgx-a100-80x4,mcml-hgx-h100-94x4,mcml-dgx-a100-40x8
 #SBATCH --qos=mcml
 #SBATCH --mem=96G
@@ -37,8 +37,9 @@ srun --exclusive --ntasks=1 python process_vggsound.py \
     --dataset_path $MCMLSCRATCH/datasets/vggsound_test \
     --video_csv ../../data/test.csv \
     --output_csv csv/$modality/predictions.csv \
-    --page $SLURM_ARRAY_TASK_ID \
-    --per_page 1000 \
+    --page \$((\$SLURM_ARRAY_TASK_ID * 2 + \$SLURM_LOCALID)) \
+    --per_page 7750 \
     --modality $modality \
     --prompt_mode gpt \
-    --prompt "$PROMPT"
+    --prompt "$PROMPT" \
+    --device cuda:\$SLURM_LOCALID
